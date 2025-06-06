@@ -27,3 +27,14 @@ st.write("Sample DataFrame", df)
 
 plt.plot(df["x"], df["y"])
 st.pyplot(plt)
+
+st.title("Contact Form")
+
+with st.form("contact"):
+    name = st.text_input("Your Name")
+    email = st.text_input("Your Email")
+    message = st.text_area("Message")
+    submitted = st.form_submit_button("Submit")
+
+    if submitted:
+        st.success(f"Thanks, {name}! We received your message.")
