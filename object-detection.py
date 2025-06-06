@@ -2,32 +2,39 @@ import streamlit as st
 from PIL import Image
 import os
 
-path = "E:/P Works/My Projects/Project - ทุน ศ สูง มข/web_component/"
-#path = ""  #use this path for deploy
+#path = "E:/P Works/My Projects/Project - ทุน ศ สูง มข/web_component/"
+path = ""  #use this path for deploy
 
 #--------------------------------------------------------------------------------------------------
 #login_page
 #--------------------------------------------------------------------------------------------------
+import csv
 from datetime import datetime
 
 def login_page():
-    st.title("Login to Our Platform")
-    st.write("Please enter your credentials to access the platform.")
-    
-    username = st.text_input("Username", placeholder="Enter your username")
-    password = st.text_input("Password", type="password", placeholder="Enter your password")
-    
-    if st.button("Login"):
-        if username == "" and password == "":
-            st.session_state.logged_in = True
-            st.success("Successfully logged in!")
-        else:
-            st.error("Invalid username or password.")
+    CSV_FILE = path + "userlogin.csv"
+
+    st.title("User Information")
+
+    with st.form(key='user_form'):
+        name = st.text_input("Name")
+        surname = st.text_input("Surname")
+        affiliation = st.text_input("Affiliation")
+        submit_button = st.form_submit_button(label='Submit')
+
+    if submit_button:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(CSV_FILE, mode='a', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow([name, surname, affiliation, timestamp])
+        st.success("Thank you!")
+        st.session_state.logged_in = True
 #--------------------------------------------------------------------------------------------------
 #home_page
 #--------------------------------------------------------------------------------------------------
 def home_page():
     st.title("A platform for pinworm detection")
+    st.subheader("Unlock expert pinworm detection knowledge at your fingertips — completely free for everyone.")
     st.write("A platform for pinworm detection was developed by the High Potential Research Team Grant Program (Contract no. N42A670561 to Wanchai Maleewong (WM)).")
 
     col1, col2 = st.columns(2)
@@ -40,8 +47,8 @@ def home_page():
         img_2 = Image.open(path + "ev-web/output_3141.png")
         #------------------------------------------------------------------------------------------
 
-        st.image(img_1, caption="Input image", use_column_width=True)
-        st.image(img_2, caption="Detection image", use_column_width=True)
+        st.image(img_1, caption="Input image", use_container_width=True)
+        st.image(img_2, caption="Detection image", use_container_width=True)
 
     with col2:
         st.subheader("Parasited image")
@@ -51,8 +58,8 @@ def home_page():
         img_4 = Image.open(path + "ev-web/output_3146.png")
         #------------------------------------------------------------------------------------------
 
-        st.image(img_3, caption="Input image", use_column_width=True)
-        st.image(img_4, caption="Detection image", use_column_width=True)
+        st.image(img_3, caption="Input image", use_container_width=True)
+        st.image(img_4, caption="Detection image", use_container_width=True)
 #--------------------------------------------------------------------------------------------------
 #pinworm_detail_page
 #--------------------------------------------------------------------------------------------------
@@ -102,11 +109,11 @@ def pinworm_detail_page():
     #------------------------------------------------------------------------------------------
 
     with col1:
-        st.image(img_1, use_column_width=True)
+        st.image(img_1, use_container_width=True)
     with col2:
-        st.image(img_2, use_column_width=True)
+        st.image(img_2, use_container_width=True)
     with col3:
-        st.image(img_3, use_column_width=True)
+        st.image(img_3, use_container_width=True)
 
     st.header("Life Cycle")
     st.markdown("""
@@ -297,11 +304,11 @@ def quiz_page():
             ["Presence of lateral alae","Pointed posterior end","Bulbous esophagus","Presence of cervical wings","Coiled appearance"]
         )
         q4 = st.radio(
-            "What is the primary location where E. vermicularis eggs are typically found during examination?",
+            "Question 4: What is the primary location where E. vermicularis eggs are typically found during examination?",
             ["In concentrated stool samples","Perianal skin folds","Within the intestinal mucosa","In urine sediment","Blood smears"]
         )
         q5 = st.radio(
-            "Which staining technique is most appropriate for visualizing E. vermicularis eggs?",
+            "Question 5: Which staining technique is most appropriate for visualizing E. vermicularis eggs?",
             ["Gram stain","Acid-fast stain","No stain needed (best examined unstained)","Giemsa stain","Trichrome stain"]
         )
         submit_button = st.form_submit_button(label="Submit Answers")
@@ -475,7 +482,7 @@ def about_page():
     image = Image.open(path + "page/banner.jpg")
     #----------------------------------------------------------------------------------------------
     
-    st.image(image, use_column_width=True)
+    st.image(image, use_container_width=True)
     
     st.markdown("---")
     st.subheader("This project was funded by the grant from the National Research Council of Thailand (NRCT):")
@@ -502,7 +509,7 @@ else:
     image = Image.open(path + "page/Monogram-Logo-02-320x160.png")
     #----------------------------------------------------------------------------------------------
 
-    st.sidebar.image(image, use_column_width=True)
+    st.sidebar.image(image, use_container_width=True)
     st.sidebar.markdown("<div class='sidebar-title'>Platform Navigation</div>", unsafe_allow_html=True)
     
     pages = {
