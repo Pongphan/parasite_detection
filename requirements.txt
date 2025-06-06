@@ -3,3 +3,4 @@ numpy
 tensorflow==2.18
 keras
 pillow
+python==3.12
