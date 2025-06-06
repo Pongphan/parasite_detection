@@ -1,6 +1,5 @@
 opencv-python-headless
 numpy
-tensorflow==2.18
+tensorflow>=2.13.0,<2.16.0
 keras
 pillow
-python==3.12
