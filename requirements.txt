@@ -1,2 +1,5 @@
-pandas
-matplotlib
+opencv-python-headless
+numpy
+tensorflow
+keras
+pillow
