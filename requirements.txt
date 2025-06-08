@@ -1,4 +1,4 @@
---upgrade pip
+pip-upgrade
 pillow
 opencv-python-headless
 numpy
