@@ -1,6 +1,4 @@
-pip-upgrade
 pillow
 opencv-python-headless
 numpy
 tensorflow
-keras
