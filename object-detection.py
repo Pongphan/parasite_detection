@@ -11,7 +11,7 @@ st.subheader("Upload & View Image")
 st.write("Upload an image and view it below.")
 
 #-------------------------------------------------------------------------------------------------------------------------
-model_path = path + "model/ov_mif_mobilenet.keras"
+model_path = path + "model/ov_mif_cnn.keras"
 class_label = ["Artifact", "Ov", "MIF"]
 
 def mse(y_true, y_pred):
