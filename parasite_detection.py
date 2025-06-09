@@ -2,8 +2,6 @@ import streamlit as st
 from PIL import Image
 import cv2
 import numpy as np
-import tensorflow as tf
-from tensorflow import keras
 from keras.models import load_model
 from keras.losses import mean_squared_error
 
@@ -11,8 +9,8 @@ st.title("AI Detector")
 st.subheader("Upload & View Image")
 st.write("Upload an image and view it below.")
 
-#-------------------------------------------------------------------------------------------------------------------------
-model_path = path + "model/ov_mif_cnn.keras"
+#--------------------------------------------------------------------------------------------------
+model_path = "model/ov_mif_cnn.keras"
 class_label = ["Artifact", "Ov", "MIF"]
 
 def mse(y_true, y_pred):
@@ -89,7 +87,9 @@ def merge_connected_boxes_by_class(detections, merge_iou_threshold):
     return merged
 
 def ObjectDet(filepath, threshold, nms_threshold, merge_iou_threshold):
-    img = cv2.imread(filepath)
+    #img = cv2.imread(filepath)
+    img = filepath
+
     box_size_y, box_size_x, step_size = 210, 210, 50
     resize_input_y, resize_input_x = 64, 64
     img_h, img_w = img.shape[:2]
@@ -126,18 +126,21 @@ def ObjectDet(filepath, threshold, nms_threshold, merge_iou_threshold):
         color = colors[class_idx % len(colors)]
         img_output = drawbox(img_output, label, a, b, c, d, color)
     return img_output
-#-------------------------------------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------------
 
 uploaded_file = st.file_uploader("Choose an image file", type=["png", "jpg", "jpeg", "tif"])
 if uploaded_file is not None:
     try:
         image = np.array(Image.open(uploaded_file))
+        st.write(f"Image successfully loaded!: {uploaded_file.name}")
+        
         if image.ndim == 2:
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
         st.image(image, caption="Uploaded Image")
 
-        output_img = objectdet(image, 0.90, 0.3, 0.1)
+        output_img = ObjectDet(image, 0.90, 0.3, 0.1)
         st.image(output_img, caption="Processed Image")
 
     except Exception as e:
