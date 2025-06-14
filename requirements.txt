@@ -2,4 +2,4 @@ pip>=23.0
 streamlit
 pandas
 numpy
-tensorflow>=2.13
+tensorflow==2.13
