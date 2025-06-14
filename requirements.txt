@@ -1,5 +1,5 @@
-pillow
 opencv-python-headless
-numpy<=2.0
-tensorflow<=2.18
+numpy
+tensorflow
 keras
+pillow
