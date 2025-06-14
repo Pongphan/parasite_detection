@@ -1,9 +1,4 @@
-3.9
-pip
-streamlit==1.26.1
 opencv-python-headless
 numpy
-tensorflow==2.13.0
 keras
 pillow
-PyGithub
