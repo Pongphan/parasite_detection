@@ -3,14 +3,14 @@ from PIL import Image
 import os
 import cv2
 import numpy as np
-import keras
+import tensorflow as tf
 
 st.title("AI Detector")
 st.subheader("Upload & View Image")
 st.write("Upload an image and view it below.")
 
 model_path = "model/ev_cnn_mobile.h5"
-model = keras.models.load_model(model_path, custom_objects={'mse': keras.losses.MeanSquaredError()})
+model = tf.keras.models.load_model(model_path, custom_objects={'mse': tf.keras.losses.MeanSquaredError()})
 
 def boxlocation(img_c, box_size):
     non_zero_points = np.argwhere(img_c > 0)
