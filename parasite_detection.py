@@ -1,72 +1,43 @@
 import streamlit as st
-from PIL import Image
-import os
-import cv2
 import numpy as np
-import tensorflow as tf
+import cv2
+from keras.models import load_model
+from PIL import Image
 
-st.title("AI Detector")
-st.subheader("Upload & View Image")
-st.write("Upload an image and view it below.")
+# Load your models (example with 4 classes)
+model1 = load_model('ev_cnn_mobile.keras')
 
-model_path = "model/ev_cnn_mobile.keras"
-model = tf.keras.models.load_model(model_path, custom_objects={'mse': tf.keras.losses.MeanSquaredError()})
+models = [model1]
+class_names = ['Class 0', 'Class 1']
+patch_sizes = 650, 650
 
-def boxlocation(img_c, box_size):
-    non_zero_points = np.argwhere(img_c > 0)
-    if non_zero_points.size == 0:
-        return None
+def search_patches(img):
+    h, w, _ = img.shape
+    results = []
+    for idx, (ph, pw) in enumerate(patch_sizes):
+        for y in range(0, h-ph, ph//2):
+            for x in range(0, w-pw, pw//2):
+                patch = img[y:y+ph, x:x+pw]
+                patch_resized = cv2.resize(patch, (ph, pw))
+                patch_input = patch_resized / 255.0
+                patch_input = np.expand_dims(patch_input, axis=0)
+                pred = models[idx].predict(patch_input)
+                if pred[0, 0] > 0.9:  # Adjust threshold as needed
+                    results.append((class_names[idx], x, y, pw, ph))
+    return results
 
-    y_min, x_min = np.min(non_zero_points, axis=0)
-    y_max, x_max = np.max(non_zero_points, axis=0)
+st.title("Patch Searching Object Detection App")
 
-    return [y_min - box_size, y_max + box_size, x_min - box_size, x_max + box_size]
-
-def drawbox(img, label, a, b, c, d, box_size):
-    image = cv2.rectangle(img, (c, a), (d, b), (0, 255, 0), 2)
-    image = cv2.putText(image, label, (c + box_size, a - 10), cv2.FONT_HERSHEY_TRIPLEX, 2, (255, 0, 255), 1)
-    return image
-
-def objectdet(img):
-    img = cv2.resize(img, (img.shape[1] // 1, img.shape[0] // 1), interpolation=cv2.INTER_AREA)
+uploaded_file = st.file_uploader("Upload an image", type=['jpg', 'jpeg', 'png'])
+if uploaded_file:
+    image = Image.open(uploaded_file).convert("RGB")
+    img = np.array(image)
+    st.image(image, caption='Uploaded Image', use_column_width=True)
     
-    box_size_y, box_size_x = 370, 370
-    step_size = 50
-    img_output = np.array(img)
-    img_cont = np.zeros((img_output.shape[0], img_output.shape[1]), dtype=np.uint8)
-    result = 0
-
-    for i in range(0, img_output.shape[0] - box_size_y, step_size):
-        for j in range(0, img_output.shape[1] - box_size_x, step_size):
-            img_patch = img_output[i:i + box_size_y, j:j + box_size_x]
-            img_patch = cv2.resize(img_patch, (128, 128), interpolation=cv2.INTER_AREA)
-            img_patch = np.expand_dims(img_patch, axis=0)
-
-            y_outp = model.predict(img_patch, verbose=0)
-
-            if result < y_outp[0][1] and y_outp[0][1] > 0.95:
-                result = y_outp[0][1]
-                img_cont[i + (box_size_y // 2), j + (box_size_x // 2)] = int(y_outp[0][1] * 255)
-
-    if result != 0:
-        label = f"ev: {result:.2f}"
-        boxlocat = boxlocation(img_cont, box_size_x // 2)
-        if boxlocat:
-            img_output = drawbox(img, label, *boxlocat, box_size_x // 2)
-
-    return img_output
-
-uploaded_file = st.file_uploader("Choose an image file", type=["png", "jpg", "jpeg", "tif"])
-if uploaded_file is not None:
-    try:
-        image = np.array(Image.open(uploaded_file))
-        if image.ndim == 2:
-            image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-
-        st.image(image, caption="Uploaded Image")
-
-        output_img = objectdet(image)
-        st.image(output_img, caption="Processed Image")
-
-    except Exception as e:
-        st.error(f"Error loading image: {e}")
+    st.write("Searching for objects...")
+    boxes = search_patches(img)
+    if boxes:
+        for label, x, y, w, h in boxes:
+            st.write(f"Found {label} at [{x}, {y}, {w}, {h}]")
+    else:
+        st.write("No objects detected.")
