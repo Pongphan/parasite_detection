@@ -1,4 +1,5 @@
 3.9
+pip
 streamlit==1.26.1
 opencv-python-headless
 numpy
