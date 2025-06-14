@@ -1,3 +1,3 @@
-import stramlit as st
+import stremlit as st
 
 st.header("test app")
