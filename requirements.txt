@@ -1,3 +1,2 @@
---upgrade-strategy eager
 pip>=23.0
 tensorflow
