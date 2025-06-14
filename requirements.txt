@@ -1,5 +1,5 @@
 streamlit==1.45.1
---upgrade pip
+pip
 opencv-python-headless
 numpy
 tensorflow
