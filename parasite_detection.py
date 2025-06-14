@@ -9,7 +9,7 @@ st.title("AI Detector")
 st.subheader("Upload & View Image")
 st.write("Upload an image and view it below.")
 
-model_path = "model/ev_cnn_mobile.h5"
+model_path = "model/ev_cnn_mobile.keras"
 model = tf.keras.models.load_model(model_path, custom_objects={'mse': tf.keras.losses.MeanSquaredError()})
 
 def boxlocation(img_c, box_size):
