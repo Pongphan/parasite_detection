@@ -1,2 +1,2 @@
 pip>=23.0
-tensorflow==1.8.0
+tensorflow>=1.8.0
