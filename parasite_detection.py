@@ -6,7 +6,7 @@ import tensorflow as tf
 st.title("Ev Detector")
 
 #----------------------------------------------------------------------------------------------
-model_path = "model/aug_img_cnn.h5"
+model_path = "model/ev_cnn_mobile.h5"
 #----------------------------------------------------------------------------------------------
 
 model = tf.keras.models.load_model(model_path, custom_objects={'mse': tf.keras.losses.MeanSquaredError()})
