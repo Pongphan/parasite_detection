@@ -2,6 +2,7 @@ import streamlit as st
 import cv2
 import numpy as np
 import tensorflow as tf
+from PIL import Image
 
 st.title("Ev Detector")
 
