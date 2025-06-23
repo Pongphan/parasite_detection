@@ -7,7 +7,7 @@ from PIL import Image
 st.title("Ev Detector")
 
 #----------------------------------------------------------------------------------------------
-model_path = "model/ev_cnn_mobile.h5"
+model_path = "model/ev_cnn_mobile.keras"
 #----------------------------------------------------------------------------------------------
 
 model = tf.keras.models.load_model(model_path, custom_objects={'mse': tf.keras.losses.MeanSquaredError()})
