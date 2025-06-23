@@ -8,7 +8,6 @@ st.title("Ev Detector")
 
 #----------------------------------------------------------------------------------------------
 model_path = "model/ev_cnn_mobile.keras"
-#----------------------------------------------------------------------------------------------
 
 model = tf.keras.models.load_model(model_path, custom_objects={'mse': tf.keras.losses.MeanSquaredError()})
 
@@ -55,6 +54,7 @@ def objectdet(img):
             img_output = drawbox(img, label, *boxlocat, box_size_x // 2)
 
     return img_output
+#----------------------------------------------------------------------------------------------
 
 uploaded_file = st.file_uploader("Choose an image file", type=["png", "jpg", "jpeg", "tif"])
 if uploaded_file is not None:
