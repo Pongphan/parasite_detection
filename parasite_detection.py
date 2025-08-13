@@ -1,4 +1,3 @@
-# ai_detector.py
 import os
 import io
 import time
@@ -11,16 +10,11 @@ from keras.losses import mean_squared_error
 
 st.set_page_config(page_title="AI Detector", layout="wide")
 
-# ----------------- Sidebar: model location & params -----------------
-st.sidebar.title("Model settings")
-
-# Default path (edit to your Drive/Colab mount if needed)
 default_model_dir = "model/"
 model_dir = st.sidebar.text_input("Model directory", value=default_model_dir, help="Folder that contains the *.keras models")
 
 CLASS_LABEL = ["Artifact", "As_fer", "As_unfer", "Hd", "Hn", "Hw", "Mif", "Ov", "Tn", "Tt"]
 
-# class_idx : (filename, (box_h, box_w))
 CLASS_CONFIGS = {
     1: ("cnn_asfer460.keras",  (460, 460)),
     2: ("cnn_asunfer650.keras",(650, 650)),
@@ -33,7 +27,6 @@ CLASS_CONFIGS = {
     9: ("cnn_tt460.keras",     (460, 460)),
 }
 
-# ----------------- Caching -----------------
 def mse(y_true, y_pred):
     return mean_squared_error(y_true, y_pred)
 
@@ -56,7 +49,6 @@ if MISSING:
         for p in MISSING:
             st.markdown(f"- `{p}`")
 
-# --- Detector internals (optimized) ---
 def drawbox(img, label, a, b, c, d, color):
     # bbox [top,bottom,left,right]
     cv2.rectangle(img, (c, a), (d, b), color, 2)
@@ -141,10 +133,7 @@ def merge_connected_boxes_by_class(detections, merge_iou_threshold):
             merged.append({"bbox": [tops, bots, lefts, rights], "class_idx": cls, "score": max_score})
     return merged
 
-def object_det_from_image(img_bgr: np.ndarray,
-                          threshold=0.5, nms_threshold=0.4, merge_iou_threshold=0.3,
-                          step_size=None, input_size=(64,64), background_std_cut=4.0):
-    """Run detection on a BGR numpy image and return (img_out, merged_detections, timings)."""
+def object_det_from_image(img_bgr: np.ndarray, threshold=0.5, nms_threshold=0.4, merge_iou_threshold=0.3, step_size=None, input_size=(64,64), background_std_cut=4.0):
     assert img_bgr is not None and img_bgr.ndim == 3, "Input image must be BGR (H,W,3)"
     H, W = img_bgr.shape[:2]
     in_w, in_h = int(input_size[0]), int(input_size[1])
@@ -165,7 +154,6 @@ def object_det_from_image(img_bgr: np.ndarray,
             continue
         coords = np.stack(np.meshgrid(ys, xs, indexing='ij'), axis=-1).reshape(-1, 2)
 
-        # background pre-filter (stddev on downscaled ROI)
         scale_y = tiny.shape[0] / H
         scale_x = tiny.shape[1] / W
         ty = (coords[:,0] * scale_y).astype(np.int32)
@@ -207,10 +195,6 @@ def object_det_from_image(img_bgr: np.ndarray,
             continue
 
         X = np.asarray(patches, dtype=np.uint8)
-        # If your models expect normalization add a Rescaling layer in the .keras,
-        # or uncomment next two lines:
-        # X = X.astype(np.float32) / 255.0
-
         y_out = model.predict(X, batch_size=128, verbose=0)
         y_out = np.asarray(y_out)
         if y_out.ndim == 2 and y_out.shape[1] >= 2:
@@ -221,18 +205,13 @@ def object_det_from_image(img_bgr: np.ndarray,
         pass_idx = np.where(scores > threshold)[0]
         for k in pass_idx:
             y, x = anchors[k]
-            detections.append({
-                "bbox": [int(y), int(y + box_h), int(x), int(x + box_w)],
-                "score": float(scores[k]),
-                "class_idx": class_idx
-            })
+            detections.append({"bbox": [int(y), int(y + box_h), int(x), int(x + box_w)], "score": float(scores[k]), "class_idx": class_idx})
     infer_time = time.perf_counter()
 
     nms_dets   = nms_fast(detections, iou_thr=nms_threshold)
     merged     = merge_connected_boxes_by_class(nms_dets, merge_iou_threshold)
     post_time  = time.perf_counter()
 
-    # draw
     out = img_bgr.copy()
     colors = [(0,255,0), (255,0,0), (0,0,255), (0,255,255), (255,0,255),
               (255,255,0), (128,128,0), (0,128,128), (128,0,128), (100,100,100), (200,100,50)]
@@ -254,8 +233,7 @@ def object_det_from_image(img_bgr: np.ndarray,
     }
     return out, merged, timings
 
-# ----------------- Main UI -----------------
-st.title("🧪 AI Detector (Sliding-window CNN)")
+st.title("🧪 AI Detector")
 
 tab1, tab2 = st.tabs(["Run Detector", "Advanced Parameters"])
 
@@ -268,11 +246,9 @@ with tab1:
         nms_thr   = st.slider("NMS IoU", 0.0, 1.0, 0.40, 0.01)
     with colB:
         merge_thr = st.slider("Merge IoU", 0.0, 1.0, 0.30, 0.01)
-        bg_std    = st.slider("Background std cutoff", 0.0, 20.0, 4.0, 0.5,
-                              help="Higher skips more flat patches (faster, but may miss faint objects)")
+        bg_std    = st.slider("Background std cutoff", 0.0, 20.0, 4.0, 0.5, help="Higher skips more flat patches (faster, but may miss faint objects)")
     with colC:
-        step_size = st.number_input("Override stride (px)", min_value=0, value=0,
-                                    help="0 = automatic per class")
+        step_size = st.number_input("Override stride (px)", min_value=0, value=0, help="0 = automatic per class")
         in_w = st.number_input("Model input width", 32, 512, 64, step=16)
         in_h = st.number_input("Model input height", 32, 512, 64, step=16)
 
