@@ -243,7 +243,7 @@ with tab1:
         nms_thr   = st.slider("NMS IoU", 0.0, 1.0, 0.50, 0.01)
     with colB:
         merge_thr = st.slider("Merge IoU", 0.0, 1.0, 0.50, 0.01)
-        bg_std    = st.slider("Background std cutoff", 0.0, 40.0, 4.0, 0.5, help="Higher skips more flat patches (faster, but may miss faint objects)")
+        bg_std    = st.slider("Background std cutoff", 0.0, 20.0, 10.0, 0.5, help="Higher skips more flat patches (faster, but may miss faint objects)")
     with colC:
         step_size = st.number_input("Override stride (px)", min_value=0, value=0, help="0 = automatic per class")
         in_w = st.number_input("Model input width", 32, 512, 64, step=16)
