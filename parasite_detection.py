@@ -10,11 +10,8 @@ from keras.losses import mean_squared_error
 
 st.set_page_config(page_title="AI Detector", layout="wide")
 
-default_model_dir = "model/"
-model_dir = st.sidebar.text_input("Model directory", value=default_model_dir, help="Folder that contains the *.keras models")
-
+model_dir = "model/"
 CLASS_LABEL = ["Artifact", "As_fer", "As_unfer", "Hd", "Hn", "Hw", "Mif", "Ov", "Tn", "Tt"]
-
 CLASS_CONFIGS = {
     1: ("cnn_asfer460.keras",  (460, 460)),
     2: ("cnn_asunfer650.keras",(650, 650)),
