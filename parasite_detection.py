@@ -15,7 +15,7 @@ st.set_page_config(page_title="AI Detector", layout="wide")
 st.sidebar.title("Model settings")
 
 # Default path (edit to your Drive/Colab mount if needed)
-default_model_dir = "/content/drive/MyDrive/sth_images/"
+default_model_dir = "model/"
 model_dir = st.sidebar.text_input("Model directory", value=default_model_dir, help="Folder that contains the *.keras models")
 
 CLASS_LABEL = ["Artifact", "As_fer", "As_unfer", "Hd", "Hn", "Hw", "Mif", "Ov", "Tn", "Tt"]
